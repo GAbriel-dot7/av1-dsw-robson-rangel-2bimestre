@@ -3,7 +3,6 @@ import { Navbar } from './components/Navbar';
 import { LivroForm } from './components/LivroForm';
 import { LivroList } from './components/LivroList';
 import { livroService } from './services/livroService';
-import './App.css';
 
 function App() {
   const [page, setPage] = useState('home');
