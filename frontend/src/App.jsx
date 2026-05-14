@@ -1,122 +1,138 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { Navbar } from './components/Navbar';
+import { LivroForm } from './components/LivroForm';
+import { LivroList } from './components/LivroList';
+import { livroService } from './services/livroService';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [page, setPage] = useState('home');
+  const [livros, setLivros] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [livroEmEdicao, setLivroEmEdicao] = useState(null);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    carregarLivros();
+  }, []);
+
+  const carregarLivros = async () => {
+    setLoading(true);
+    try {
+      const data = await livroService.getLivros();
+      setLivros(data);
+      setError('');
+    } catch (err) {
+      setError(err);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    await carregarLivros();
+    setPage('home');
+    setLivroEmEdicao(null);
+  };
+
+  const handleEdit = (livro) => {
+    setLivroEmEdicao(livro);
+    setPage('edit');
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm('Tem certeza que deseja deletar este livro?')) {
+      try {
+        await livroService.deletar(id);
+        await carregarLivros();
+        alert('✅ Livro deletado com sucesso!');
+      } catch (err) {
+        alert(`❌ Erro: ${err}`);
+      }
+    }
+  };
+
+  const filteredLivros = livros.filter(
+    (livro) =>
+      livro.titulo.toLowerCase().includes(search.toLowerCase()) ||
+      livro.autor.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="min-h-screen bg-gray-100">
+      <Navbar
+        onHome={() => {
+          setPage('home');
+          setLivroEmEdicao(null);
+          setSearch('');
+        }}
+        onCreate={() => {
+          setLivroEmEdicao(null);
+          setPage('create');
+        }}
+      />
 
-      <div className="ticks"></div>
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <p className="font-bold">❌ Erro</p>
+            <p>{error}</p>
+          </div>
+        )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {page === 'home' && (
+          <>
+            <div className="mb-8">
+              <input
+                type="text"
+                placeholder="🔍 Buscar por título ou autor..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl font-bold text-gray-800">
+                {search ? `📚 Resultados (${filteredLivros.length})` : `📖 Biblioteca (${livros.length})`}
+              </h2>
+              <button
+                onClick={carregarLivros}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600"
+              >
+                🔄 Atualizar
+              </button>
+            </div>
+            <LivroList
+              livros={filteredLivros}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              loading={loading}
+            />
+          </>
+        )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        {page === 'create' && (
+          <LivroForm
+            onSave={handleSave}
+            onCancel={() => setPage('home')}
+          />
+        )}
+
+        {page === 'edit' && livroEmEdicao && (
+          <LivroForm
+            livro={livroEmEdicao}
+            onSave={handleSave}
+            onCancel={() => {
+              setPage('home');
+              setLivroEmEdicao(null);
+            }}
+          />
+        )}
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
