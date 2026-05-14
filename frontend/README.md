@@ -1,18 +1,59 @@
-# React + Vite
+# Biblioteca de Livros - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface em React + Vite para consumir a API da biblioteca de livros da AV1.
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js instalado
+- Backend rodando em `http://localhost:5000`
 
-## React Compiler
+## Instalação
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+```bash
+npm install
+```
 
-Note: This will impact Vite dev & build performances.
+## Execução
 
-## Expanding the ESLint configuration
+```bash
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Build de produção
+
+```bash
+npm run build
+```
+
+## Funcionalidades
+
+- Listar livros
+- Criar livro
+- Editar livro
+- Excluir livro
+- Buscar por título ou autor
+
+## Configuração da API
+
+Se necessário, defina a URL do backend no arquivo `.env` do frontend:
+
+```bash
+VITE_API_URL=http://localhost:5000
+```
+
+## Estrutura
+
+```text
+src/
+├── components/
+│   ├── LivroCard.jsx
+│   ├── LivroForm.jsx
+│   ├── LivroList.jsx
+│   └── Navbar.jsx
+├── services/
+│   └── livroService.js
+├── App.jsx
+├── App.css
+├── index.css
+└── main.jsx
+```

@@ -1,16 +1,69 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-slate-950 text-slate-100 antialiased;
+    background-image:
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 28%),
+      radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 24%),
+      linear-gradient(180deg, #0f172a 0%, #111827 45%, #020617 100%);
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.08;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 85%);
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+@layer components {
+  .glass-panel {
+    @apply rounded-3xl border border-white/10 bg-white/10 shadow-2xl backdrop-blur-xl;
+  }
 
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  .page-shell {
+    @apply relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/30;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 px-4 py-3 font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-4 py-3 font-semibold text-slate-100 transition hover:bg-white/10;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center rounded-2xl bg-rose-500/90 px-4 py-3 font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-500;
+  }
+
+  .section-title {
+    @apply text-3xl font-black tracking-tight text-white sm:text-4xl;
+  }
 }
