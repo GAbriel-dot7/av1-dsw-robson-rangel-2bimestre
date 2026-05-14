@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca - Teste API</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: white; text-align: center; margin-bottom: 30px; }
+        .section { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .section h2 { color: #333; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        input, textarea, button { display: block; width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        input:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); }
+        button { background: #667eea; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #764ba2; }
+        .output { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 10px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; border-left: 4px solid #667eea; }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .livro-item { background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid #667eea; display: flex; justify-content: space-between; align-items: center; }
+        .livro-info { flex: 1; }
+        .livro-info strong { color: #333; }
+        .livro-info p { color: #666; font-size: 13px; margin-top: 5px; }
+        .btn-delete { background: #e74c3c; padding: 8px 15px; width: auto; cursor: pointer; border: none; color: white; border-radius: 5px; }
+        .btn-delete:hover { background: #c0392b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Biblioteca de Livros - API Teste</h1>
+
+        <div class="section">
+            <h2>➕ Adicionar Novo Livro</h2>
+            <form id="formAdicionar">
+                <div class="form-group">
+                    <input type="text" id="titulo" placeholder="Título" required>
+                    <input type="text" id="autor" placeholder="Autor" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="isbn" placeholder="ISBN" required>
+                    <input type="number" id="anoPublicacao" placeholder="Ano Publicação" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="genero" placeholder="Gênero" required>
+                    <input type="number" id="preco" placeholder="Preço" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="quantidadeDisponivel" placeholder="Quantidade" value="1">
+                </div>
+                <div class="form-group full">
+                    <textarea id="descricao" placeholder="Descrição" rows="3"></textarea>
+                </div>
+                <button type="submit">➕ Adicionar Livro</button>
+            </form>
+            <div id="outputAdicionar" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>📖 Lista de Livros</h2>
+            <button onclick="listarLivros()">🔄 Atualizar Lista</button>
+            <div id="listaLivros" class="output" style="max-height: 600px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        document.getElementById('formAdicionar').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const livro = {
+                titulo: document.getElementById('titulo').value,
+                autor: document.getElementById('autor').value,
+                isbn: document.getElementById('isbn').value,
+                anoPublicacao: parseInt(document.getElementById('anoPublicacao').value),
+                genero: document.getElementById('genero').value,
+                preco: parseFloat(document.getElementById('preco').value),
+                quantidadeDisponivel: parseInt(document.getElementById('quantidadeDisponivel').value),
+                descricao: document.getElementById('descricao').value
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/livros`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(livro)
+                });
+                
+                const data = await res.json();
+                const output = document.getElementById('outputAdicionar');
+                
+                if (data.success) {
+                    output.innerHTML = `<span class="success">✅ Livro adicionado com sucesso!</span><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                    document.getElementById('formAdicionar').reset();
+                    setTimeout(listarLivros, 500);
+                } else {
+                    output.innerHTML = `<span class="error">❌ Erro: ${data.message}</span><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                document.getElementById('outputAdicionar').innerHTML = `<span class="error">❌ Erro: ${error.message}</span>`;
+            }
+        });
+
+        async function listarLivros() {
+            try {
+                const res = await fetch(`${API_URL}/livros`);
+                const data = await res.json();
+                const listDiv = document.getElementById('listaLivros');
+                
+                if (data.success && data.data.length > 0) {
+                    listDiv.innerHTML = `<p><strong>Total: ${data.total} livro(s)</strong></p>` + 
+                        data.data.map(livro => `
+                            <div class="livro-item">
+                                <div class="livro-info">
+                                    <strong>${livro.titulo}</strong>
+                                    <p>por ${livro.autor}</p>
+                                    <p>Gênero: ${livro.genero} | R$ ${livro.preco.toFixed(2)} | Disponíveis: ${livro.quantidadeDisponivel}</p>
+                                </div>
+                                <button class="btn-delete" onclick="deletarLivro('${livro.id}')">Deletar</button>
+                            </div>
+                        `).join('');
+                } else {
+                    listDiv.innerHTML = '<p style="color: #999;">Nenhum livro cadastrado ainda...</p>';
+                }
+            } catch (error) {
+                document.getElementById('listaLivros').innerHTML = `<span class="error">❌ Erro ao listar: ${error.message}</span>`;
+            }
+        }
+
+        async function deletarLivro(id) {
+            if (!confirm('Deseja deletar este livro?')) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/livros/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    alert('✅ Livro deletado com sucesso!');
+                    listarLivros();
+                } else {
+                    alert(`❌ Erro: ${data.message}`);
+                }
+            } catch (error) {
+                alert(`❌ Erro: ${error.message}`);
+            }
+        }
+
+        // Carregar lista ao abrir
+        listarLivros();
+    </script>
+</body>
+</html>

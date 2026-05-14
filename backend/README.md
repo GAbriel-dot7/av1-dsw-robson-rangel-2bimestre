@@ -1,23 +1,139 @@
-# API de Tarefas - Arquitetura MVC
+# 📚 API de Biblioteca de Livros
 
-## 📚 Sobre o Projeto
+## Visão Geral
+API REST para gerenciamento de uma biblioteca de livros, desenvolvida com **Node.js**, **Express** e **Prisma**, seguindo o padrão **MVC**.
 
-API REST para gerenciamento de tarefas, desenvolvida com **Node.js** e **Express**, seguindo o padrão de arquitetura **MVC (Model-View-Controller)**.
+## 🚀 Quick Start
 
-## 🏗️ Arquitetura MVC
+### 1. Requisitos
+- Node.js v25+
+- MySQL (XAMPP)
+- npm
 
-### O que é MVC?
+### 2. Configuração
+```bash
+# Instalar dependências
+npm install
 
-MVC é um padrão de arquitetura que separa a aplicação em três camadas principais:
+# Copiar e editar .env
+cp .env.example .env
 
-- **Model (Modelo)**: Gerencia os dados e a lógica de negócio
-- **View (Visão)**: Apresenta os dados ao usuário (no caso de APIs, são as respostas JSON)
-- **Controller (Controlador)**: Processa as requisições e coordena Model e View
+# Executar migrations
+npx prisma migrate dev
 
-### Benefícios
+# Rodar servidor
+node src/server.js
+```
 
-- ✅ **Separação de responsabilidades**: Cada camada tem uma função específica
-- ✅ **Manutenibilidade**: Código mais fácil de entender e modificar
+Servidor disponível em: **http://localhost:5000**
+
+---
+
+## 📖 API Endpoints
+
+### Status
+```
+GET http://localhost:5000/
+```
+
+### Livros
+```
+GET    /livros              # Listar todos
+POST   /livros              # Criar novo
+GET    /livros/:id          # Obter um
+PUT    /livros/:id          # Atualizar
+DELETE /livros/:id          # Deletar
+```
+
+---
+
+## 📊 Modelo de Dados
+
+### Livro
+```json
+{
+  "id": "uuid",
+  "titulo": "string",
+  "autor": "string",
+  "isbn": "string",
+  "anoPublicacao": "integer",
+  "genero": "string",
+  "descricao": "text",
+  "quantidadeDisponivel": "integer",
+  "preco": "float",
+  "createdAt": "timestamp",
+  "updatedAt": "timestamp"
+}
+```
+
+---
+
+## 🔧 Tecnologias
+
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **ORM**: Prisma
+- **Banco**: MySQL
+- **Variáveis**: dotenv
+
+---
+
+## 📂 Estrutura
+
+```
+src/
+├── controllers/
+│   └── livroController.js     # Lógica de negócio
+├── routes/
+│   └── livroRoutes.js         # Definição de rotas
+├── config/
+│   └── prisma.js              # Configuração Prisma
+├── app.js                     # Setup Express
+└── server.js                  # Inicialização
+```
+
+---
+
+## ✅ Testes
+
+### Criar Livro
+```bash
+curl -X POST http://localhost:5000/livros \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Dom Casmurro",
+    "autor": "Machado de Assis",
+    "isbn": "978-8535924892",
+    "anoPublicacao": 1899,
+    "genero": "Romance",
+    "descricao": "Uma obra clássica",
+    "quantidadeDisponivel": 5,
+    "preco": 45.90
+  }'
+```
+
+### Listar Todos
+```bash
+curl http://localhost:5000/livros
+```
+
+---
+
+## 🐛 Troubleshooting
+
+| Erro | Solução |
+|------|---------|
+| "Can't reach database" | Inicie MySQL/XAMPP |
+| "Prisma schema validation" | `npx prisma generate` |
+| "Module not found" | `npm install` novamente |
+
+---
+
+## 📝 Notas
+
+- A API retorna sempre um objeto `{ success, message, data }`
+- CORS está habilitado para requisições do frontend
+- Validações básicas nos campos obrigatórios
 - ✅ **Escalabilidade**: Facilita a adição de novos recursos
 - ✅ **Testabilidade**: Permite testar cada camada independentemente
 - ✅ **Reutilização**: Código pode ser reutilizado em diferentes contextos

@@ -1,24 +1,22 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
-  posts Post[]
-} 
-
-model Post { 
-  id        Int     @id @default(autoincrement()) 
-  title     String
-  content   String? @db.Text
-  published Boolean @default(false) 
-  author    User    @relation(fields: [authorId], references: [id]) 
-  authorId  Int
+model Livro {
+  id                   String   @id @default(cuid())
+  titulo               String   @unique
+  autor                String
+  isbn                 String   @unique
+  anoPublicacao        Int
+  genero               String
+  descricao            String   @db.Text
+  quantidadeDisponivel Int      @default(1)
+  preco                Float
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 } 
